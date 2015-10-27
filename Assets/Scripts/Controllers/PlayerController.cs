@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour {
 	
 	void DoUpdate () {
 		
-		//groundController.ProbeGround( transform.position, Tolerance );
+		groundController.ProbeGround( transform.position, Tolerance );
 
 		recursivePushback( 0, MaxPushbackIterations );
 
