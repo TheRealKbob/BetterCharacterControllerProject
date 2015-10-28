@@ -18,7 +18,7 @@ public class PlayerFallState : PlayerState {
 	public override void OnUpdate()
 	{
 		// Check for ground
-		controller.ApplyGravity();
+		controller.Fall();
 	}
 
 	public override void OnExitState()

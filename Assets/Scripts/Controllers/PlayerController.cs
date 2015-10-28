@@ -10,12 +10,7 @@ public class PlayerController : MonoBehaviour {
 	private Vector3 moveDirection = Vector3.zero;
 	private float gravity;
 
-	private List<CollisionData> collisionData;
-
 	private GroundController groundController;
-
-	private bool clamping = true;
-	private Transform currentlyClampedTo;
 
 	public float Radius = 0.5f;
 	public LayerMask Walkable;
@@ -23,13 +18,8 @@ public class PlayerController : MonoBehaviour {
 	public Vector3 Up{ get{ return transform.up; } }
 	public Vector3 Down{ get{ return -transform.up; } }
 
-	private static float Tolerance = 0.05f;
-    private static float TinyTolerance = 0.01f;
-
-    private const int MaxPushbackIterations = 2;
-
 	void Awake () {
-		collisionData = new List<CollisionData>();
+		
 		groundController = new GroundController( Walkable, this );
 
 		currentlyClampedTo = null;
@@ -42,20 +32,31 @@ public class PlayerController : MonoBehaviour {
 	
 	void DoUpdate () {
 		
-		groundController.ProbeGround( transform.position, Tolerance );
-
-		recursivePushback( 0, MaxPushbackIterations );
+		//Phases
+		calculateMovementPhase();
+		calculatePushbackPhase();
+		calculateResolutionPhase();
 
 	}
 
-	private void recursivePushback( int depth, int maxDepth )
+	private void calculateMovementPhase()
+	{
+
+	}
+
+	private void calculatePushbackPhase()
 	{
 		bool contact = false;
-
-		foreach( Collider col in Physics.OverlapSphere(transform.position, Radius, Walkable) )
+		foreach( Collider c in Physics.OverlapSphere( Transform.position, Radius, Walkable ) )
 		{
-
+			if( c.isTrigger )
+				continue;
 		}
+	}
+
+	private void calculateResolutionPhase()
+	{
+
 	}
 
 	public void ApplyMoveVector()
@@ -63,16 +64,9 @@ public class PlayerController : MonoBehaviour {
 		transform.position += moveDirection * Time.deltaTime;
 	}
 
-	public void ApplyGravity()
+	/// Applies gravity to the movement vector
+	public void Fall()
 	{
-		if( groundController.IsGrounded( false, 0.01f ) )
-		{
-			moveDirection = MathUtils.ProjectVectorOnPlane(Up, moveDirection);
-			if( OnControllerEvent != null )
-				OnControllerEvent( PlayerControllerEvents.ENTER_GROUND );
-			return;
-		}
-
 		moveDirection -= Up * gravity * Time.deltaTime;
 	}
 }
