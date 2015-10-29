@@ -22,11 +22,14 @@ public class PlayerController : MonoBehaviour {
 	public Vector3 Down{ get{ return -transform.up; } }
 
 	private const int MaxPushbackIterations = 2;
+	private const string TemporaryLayer = "TempCast";
+	private int TemporaryLayerIndex;
+	public const float Tolerance = 0.05f;
+    public const float TinyTolerance = 0.01f;
 
 	void Awake () {
-		
+		TemporaryLayerIndex = LayerMask.NameToLayer(TemporaryLayer);
 		groundController = new GroundController( Walkable, this );
-
 	}
 
 	void Start () {
@@ -36,55 +39,7 @@ public class PlayerController : MonoBehaviour {
 	
 	void DoUpdate () {
 		
-		//Phases
-		calculateMovementPhase();
-		calculatePushbackPhase();
-		calculateResolutionPhase();
-
-	}
-
-	private void calculateMovementPhase()
-	{
-
-	}
-
-	private void calculatePushbackPhase()
-	{
-		recursivePushback();
-	}
-
-	private void recursivePushback()
-	{
-		recursivePushback( 0, MaxPushbackIterations );
-	}
-
-	private void recursivePushback( int depth, int maxDepth )
-	{
-		bool contact = false;
-		foreach( Collider c in Physics.OverlapSphere( transform.position, Radius, Walkable ) )
-		{
-			if( c.isTrigger )
-				continue;
-
-			Vector3 position = collisionSphere.Position;
-			Vector3 contactPoint = CollisionUtils.ClosestPointOnSurface( c, position, Radius );
-
-			if (contactPoint != Vector3.zero)
-            {
-            	DebugDraw.DrawMarker(contactPoint, 2.0f, Color.cyan, 0.0f, false);
-
-            	Vector3 v = contactPoint - position;
-            	if( v != Vector3.zero )
-            	{
-            		int layer = c.gameObject.layer;
-            	}
-
-            }
-		}
-	}
-
-	private void calculateResolutionPhase()
-	{
+		
 
 	}
 
