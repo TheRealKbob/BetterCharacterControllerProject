@@ -39,7 +39,7 @@ public class PlayerStateMachine : StateMachine {
 
 	protected override void PostStateUpdate()
 	{
-		controller.ApplyMoveVector();
+		
 	}
 
 	private void OnControllerEvent( string eventID )

@@ -158,20 +158,22 @@ public struct IgnoredCollider
 [Serializable]
 public class CollisionSphere
 {
-    public Vector3 origin;
+    public Transform origin;
     public float offset;
 
-    private Vector3 position;
     public Vector3 Position
     {
-        get{ return position; }
+        get
+        { 
+            Vector3 pos = new Vector3( origin.position.x, origin.position.y + offset, origin.position.z );
+            return pos; 
+        }
     }
 
-    public CollisionSphere( Vector3 origin, float offset )
+    public CollisionSphere( Transform origin, float offset )
     {
         this.origin = origin;
         this.offset = offset;
-        position = new Vector3( origin.x, origin.y + offset, origin.z );
     }
 }
 

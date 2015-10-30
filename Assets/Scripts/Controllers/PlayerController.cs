@@ -21,25 +21,22 @@ public class PlayerController : MonoBehaviour {
 	public Vector3 Up{ get{ return transform.up; } }
 	public Vector3 Down{ get{ return -transform.up; } }
 
-	private const int MaxPushbackIterations = 2;
-	private const string TemporaryLayer = "TempCast";
-	private int TemporaryLayerIndex;
-	public const float Tolerance = 0.05f;
-    public const float TinyTolerance = 0.01f;
+	private const int MAX_PUSHBACK_DEPTH = 2;
 
-	void Awake () {
-		TemporaryLayerIndex = LayerMask.NameToLayer(TemporaryLayer);
+	void Awake () {		
 		groundController = new GroundController( Walkable, this );
 	}
 
 	void Start () {
 		gravity = WorldProperties.Instance.Gravity;
-		collisionSphere = new CollisionSphere( transform.position, CollisionOffset );
+		collisionSphere = new CollisionSphere( transform, CollisionOffset );
 	}
 	
 	void DoUpdate () {
 		
-		
+		groundController.Probe( collisionSphere.Position );
+		ApplyMoveVector();
+		recursivePushBack( 0, MAX_PUSHBACK_DEPTH );
 
 	}
 
@@ -51,7 +48,37 @@ public class PlayerController : MonoBehaviour {
 	/// Applies gravity to the movement vector
 	public void Fall()
 	{
+
+		if( groundController.IsGrounded( false, 0.1f ) )
+		{
+			if( OnControllerEvent != null )
+			{
+				Debug.Log("Found Ground");
+				moveDirection = MathUtils.ProjectVectorOnPlane( Up, moveDirection );
+				OnControllerEvent( PlayerControllerEvents.ENTER_GROUND );
+				return;
+			}
+		}
+
 		moveDirection -= Up * gravity * Time.deltaTime;
+	}
+
+	private void recursivePushBack( int depth, int maxDepth )
+	{
+		bool contact = false;
+
+		foreach( Collider c in Physics.OverlapSphere( collisionSphere.Position, Radius, Walkable ) )
+		{
+			if( c.isTrigger ) continue;
+
+			/*Vector3 closestPoint = c.ClosestPointOnBounds( collisionSphere.Position );
+
+			DebugDraw.DrawMarker( closestPoint, 2.0f, Color.cyan, 0.0f, false );
+			Vector3 v = closestPoint - collisionSphere.Position;
+			transform.position += Vector3.ClampMagnitude(v, Mathf.Clamp(Radius - v.magnitude, 0, Radius));
+			Debug.Log("Hit Something in Sphere");
+			contact = true;*/
+		}
 	}
 
 	void OnDrawGizmos()
